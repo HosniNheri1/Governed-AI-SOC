@@ -1,0 +1,9 @@
+scenario,detection,risk_id,iso27001_control,iso42001_element,evidence
+Nmap SYN scan,Suricata rule + model,R-01,8.16;8.20,Monitoring plan,
+Slow scan,Model only (expected gap),R-02,8.16,AI risk assessment,
+SSH brute force,Suricata + model,R-03,8.5;8.16,Human oversight,
+FTP brute force,Suricata + model,R-04,8.5;8.15,Data quality,
+HTTP brute force,Suricata + model,R-05,8.5;8.15,Data quality,
+Benign baseline,No alert expected,R-06,8.15,Model card,
+Model drift,Monitoring threshold,R-07,8.16,Monitoring plan,
+Adversarial evasion,Documented risk,R-08,8.29,AI risk assessment,
