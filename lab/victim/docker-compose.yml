@@ -1,0 +1,20 @@
+services:
+  victim:
+    build: .
+    container_name: victim1
+    hostname: victim1
+    networks:
+      victims:
+        ipv4_address: 172.30.0.10
+    volumes:
+      - ./logs:/var/log/lab      # sshd / vsftpd / apache logs land here
+    # No "ports:" on purpose: nothing is exposed outside the lab.
+
+networks:
+  victims:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+    driver_opts:
+      com.docker.network.bridge.name: br-victims   # stable interface name

@@ -1,0 +1,29 @@
+FROM debian:12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server vsftpd apache2 apache2-utils supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Deliberately weak lab accounts (isolated lab only)
+RUN useradd -m -s /bin/bash alice && echo 'alice:sunshine1' | chpasswd \
+ && useradd -m -s /bin/bash bob   && echo 'bob:Summer2024' | chpasswd \
+ && mkdir -p /run/sshd /var/run/vsftpd/empty /var/log/lab
+
+# vsftpd: local users, logging on, no seccomp (needed in containers)
+RUN printf '%s\n' 'listen=YES' 'anonymous_enable=NO' 'local_enable=YES' \
+  'write_enable=YES' 'seccomp_sandbox=NO' 'xferlog_enable=YES' \
+  'log_ftp_protocol=YES' 'vsftpd_log_file=/var/log/lab/vsftpd.log' \
+  'dual_log_enable=NO' 'secure_chroot_dir=/var/run/vsftpd/empty' \
+  > /etc/vsftpd.conf
+
+# Apache: basic-auth page to brute-force over HTTP
+RUN htpasswd -bc /etc/apache2/.htpasswd admin letmein \
+ && mkdir -p /var/www/html/admin && echo "admin area" > /var/www/html/admin/index.html \
+ && printf '%s\n' '<Directory /var/www/html/admin>' 'AuthType Basic' \
+  'AuthName "Restricted"' 'AuthUserFile /etc/apache2/.htpasswd' \
+  'Require valid-user' '</Directory>' > /etc/apache2/conf-enabled/admin-auth.conf \
+ && sed -i 's#/var/log/apache2#/var/log/lab#g' /etc/apache2/envvars \
+ && sed -i 's#${APACHE_LOG_DIR}#/var/log/lab#g' /etc/apache2/sites-enabled/000-default.conf
+
+COPY supervisord.conf /etc/supervisor/conf.d/lab.conf
+EXPOSE 22 21 80
+CMD ["/usr/bin/supervisord", "-n"]
