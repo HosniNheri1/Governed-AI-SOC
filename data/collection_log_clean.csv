@@ -1,0 +1,14 @@
+start_time,end_time,scenario,session_id,command
+2026-11-07T10:43:29-05:00,2026-11-07T10:43:30-05:00,nmap_syn_scan,sess_20261107_104329_15972,"nmap -sS -p 1-1000 172.30.0.10"
+2026-11-07T10:45:54-05:00,2026-11-07T10:45:55-05:00,nmap_syn_scan,sess_20261107_104554_28839,"nmap -sS -p 1-1000 172.30.0.10"
+2026-11-07T10:47:36-05:00,2026-11-07T10:47:44-05:00,ssh_bruteforce,sess_20261107_104736_27248,"hydra -l root -P /tmp/pw.txt -t 4 ssh://172.30.0.10"
+2026-11-07T10:48:16-05:00,2026-11-07T10:48:30-05:00,ssh_bruteforce,sess_20261107_104816_4089,"hydra -l admin -P /tmp/pw.txt -t 2 ssh://172.30.0.10"
+2026-11-07T10:48:58-05:00,2026-11-07T10:49:05-05:00,ftp_bruteforce,sess_20261107_104858_5268,"hydra -l ftp -P /tmp/pw.txt -t 4 ftp://172.30.0.10"
+2026-11-07T10:49:42-05:00,2026-11-07T10:49:55-05:00,ftp_bruteforce,sess_20261107_104942_20414,"hydra -l anonymous -P /tmp/pw.txt -t 2 ftp://172.30.0.10"
+2026-11-07T10:50:22-05:00,2026-11-07T10:50:22-05:00,http_bruteforce,sess_20261107_105022_15559,"hydra -l admin -P /tmp/pw.txt -t 4 172.30.0.10 http-post-form /:username=^USER^&password=^PASS^:Login failed -s 8080"
+2026-11-07T10:50:47-05:00,2026-11-07T10:51:13-05:00,benign,sess_20261107_105047_9322,"./benign_generator.sh"
+2026-11-07T10:51:44-05:00,2026-11-07T10:52:15-05:00,benign,sess_20261107_105144_4902,"./benign_generator.sh"
+2026-11-07T10:52:34-05:00,2026-11-07T10:53:03-05:00,benign,sess_20261107_105234_22354,"./benign_generator.sh"
+# Class counts (day3_dataset_final.csv, 324 rows total):
+# benign: 109, ssh_bruteforce: 84, http_bruteforce: 58, ftp_bruteforce: 47, nmap_syn_scan: 26
+# Imbalance noted - nmap_syn_scan under-represented relative to session count due to few packets per alert window.
