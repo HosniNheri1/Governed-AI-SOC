@@ -1,0 +1,4 @@
+name,precision,recall,f1,fpr,tp,fp,fn,tn
+Suricata alone,1.0,0.5833333333333334,0.7368421052631579,0.0,14,0,10,8
+"Model alone (RF, out-of-fold)",1.0,1.0,1.0,0.0,24,0,0,8
+Hybrid (Suricata OR model),1.0,1.0,1.0,0.0,24,0,0,8
