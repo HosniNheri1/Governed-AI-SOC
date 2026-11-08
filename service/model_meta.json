@@ -1,0 +1,34 @@
+{
+  "feature_cols": [
+    "n_events",
+    "duration_sec",
+    "events_per_sec",
+    "mean_interarrival_sec",
+    "std_interarrival_sec",
+    "n_unique_victim_ports",
+    "n_flow_events",
+    "bytes_toserver",
+    "bytes_toclient",
+    "pkts_toserver",
+    "pkts_toclient",
+    "tcp_syn_count",
+    "tcp_rst_count",
+    "tcp_fin_count",
+    "tcp_ack_count",
+    "n_ftp_events",
+    "n_http_events",
+    "n_ssh_events",
+    "ftp_fail_rate",
+    "n_http_post"
+  ],
+  "classes": [
+    "benign",
+    "ftp_bruteforce",
+    "http_bruteforce",
+    "nmap_syn_scan",
+    "ssh_bruteforce"
+  ],
+  "n_training_sessions": 32,
+  "random_seed": 42,
+  "note": "Trained on all 32 lab sessions (Day 3 data collection, 5 classes). Day 5 cross-validated metrics (not this final fit) are the ones to cite for performance claims - this final model is for serving, not for reporting scores."
+}
