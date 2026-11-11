@@ -17,3 +17,7 @@ service/hydra.restore
 lab/victim/logs/
 *.swp
 __pycache__/
+shuffle/*.json
+!shuffle/*.masked.json
+shuffle/*.json
+!shuffle/*.masked.json
