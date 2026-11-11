@@ -77,7 +77,7 @@ Rows come from `day5_evaluation_results.csv`. The script prints only the binary 
 1. Small, synthetic, single-lab data collected on one day. Results do not transfer directly to production.
 2. Labels come from the author's own scripts.
 3. Perfect binary recall on 24 sessions is a warning sign, not a result. The protocol counters `n_ftp_events`, `n_ssh_events` and `n_http_post` may reveal the attack type directly. An ablation has not been run.
-4. The unit is the session, not the 60 s window fixed in the research design. This deviation is documented here and in the risk assessment (R-08).
+4. The unit is the session, not the 60 s window fixed in the research design. This deviation is documented here and in the risk assessment (AI-01).
 5. The evaluation uses cross-validation, not a reserved test set with at least one session of each type held out.
 6. The baseline is 4 local rules, not a tuned ruleset. The gain over Suricata is a gain over these rules.
 7. One slow-scan session (`-T2`, 500 ports) is in the evaluation set and was correctly caught and labeled by the model, while Suricata missed it (R-02) - but this is a single session, not a general detection rate for slow scans. No version-detection scan beyond the one `nmap -sV` session (see failure mode table below) is in the set. Isolation Forest was not evaluated here.

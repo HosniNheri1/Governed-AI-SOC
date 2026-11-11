@@ -2,7 +2,7 @@
 
 Document: grc/42001/02-ai-risk-and-impact-assessment.md | Version 0.1 | 2026-11-11 | Status: Draft
 Related ISO/IEC 42001 topics: AI risk assessment (6.1.2), AI risk treatment (6.1.3), AI system impact assessment (6.1.4); Annex A theme on assessing impacts of AI systems.
-Risk IDs R-01 to R-07 follow the traceability matrix in the roadmap. R-08 onward are new. Align them with the ISO 27001 register in `grc/27001/` before publishing.
+Risk IDs R-01 to R-07 follow the traceability matrix in the roadmap. AI-01 onward are new. Align them with the ISO 27001 register in `grc/27001/` before publishing.
 
 ## 1. Method
 
@@ -37,15 +37,15 @@ Statistical note. With 8 benign sessions, 0 false positives gives a one-sided 95
 | R-05 | False positive leads to a wrongful block | FPR 0/8, but upper bound 31.2%. Block is simulated and needs approval | 2 | 4 | 8 | Approval step; FPR monitoring; do not enable real blocking | Open |
 | R-06 | Model drift | Training data from one day. No drift measurement yet | 3 | 3 | 9 | Monitoring plan indicators and thresholds | Open |
 | R-07 | Adversarial evasion (low-rate, timing changes, padding) | Features are counts and timings an attacker controls. Not tested | 2 | 4 | 8 | Documented risk only. Out of scope for experiments | Accepted |
-| R-08 | Optimistic evaluation | Recall 1.00 is a warning sign per the research design. One row per session (design said 60 s window); stratified 5-fold out-of-fold, not a reserved test set; protocol-specific counters (`n_ftp_events`, `n_ssh_events`, `n_http_post`) may reveal the class | 4 | 4 | 16 | Reserve test-only sessions; run a different-session test; ablate protocol counters; document the deviation from the design | Open |
-| R-09 | Human oversight not provable | `simulated-block` hard-codes `"decision":"approve"` and an analyst address. A rejection ends the run as ABORTED with no recorded reason | 4 | 4 | 16 | Write the actual approval result and reason into the record; log rejections explicitly | Open (G-1) |
-| R-10 | Endpoint exposure and secrets | The scoring endpoint is reached through a public tunnel URL with an API key header. TLS verification is off on the HTTP node. The Shuffle export contains an API key and a password in clear text | 4 | 4 | 16 | Rotate the credentials, mask the export, restrict or remove the tunnel, turn TLS verification on | Open (G-2) |
-| R-11 | Baseline is weak, so the gain is overstated | "Suricata alone" means 4 local rules. A tuned ruleset may close the gap | 3 | 3 | 9 | State the baseline definition next to every number; optionally add a tuned-ruleset run | Open |
-| R-12 | Dataset bias and representativeness | One day, one lab, attacks scripted by the author, default tool parameters, class imbalance (8/7/6/6/5) | 4 | 3 | 12 | Vary tools, timing and targets; state limits; no production claims | Open |
-| R-13 | Third-party components | scikit-learn, Splunk, Shuffle, Suricata, tunnel service. AbuseIPDB and VirusTotal are in the roadmap but not in the workflow export | 2 | 3 | 6 | Pin versions in a requirements file; list suppliers; add enrichment or remove it from claims | Open |
-| R-14 | Silent loss of telemetry | Ingestion was 3 days stale on 2026-11-11 because the capture chain had stopped between sessions | 4 | 3 | 12 | Ingestion-freshness alert; restart checklist | Open |
+| AI-01 | Optimistic evaluation | Recall 1.00 is a warning sign per the research design. One row per session (design said 60 s window); stratified 5-fold out-of-fold, not a reserved test set; protocol-specific counters (`n_ftp_events`, `n_ssh_events`, `n_http_post`) may reveal the class | 4 | 4 | 16 | Reserve test-only sessions; run a different-session test; ablate protocol counters; document the deviation from the design | Open |
+| AI-02 | Human oversight not provable | `simulated-block` hard-codes `"decision":"approve"` and an analyst address. A rejection ends the run as ABORTED with no recorded reason | 4 | 4 | 16 | Write the actual approval result and reason into the record; log rejections explicitly | Open (G-1) |
+| R-09 | Endpoint exposure and secrets | The scoring endpoint is reached through a public tunnel URL with an API key header. TLS verification is off on the HTTP node. The Shuffle export contains an API key and a password in clear text | 4 | 4 | 16 | Rotate the credentials, mask the export, restrict or remove the tunnel, turn TLS verification on | Open (G-2) |
+| AI-03 | Baseline is weak, so the gain is overstated | "Suricata alone" means 4 local rules. A tuned ruleset may close the gap | 3 | 3 | 9 | State the baseline definition next to every number; optionally add a tuned-ruleset run | Open |
+| AI-04 | Dataset bias and representativeness | One day, one lab, attacks scripted by the author, default tool parameters, class imbalance (8/7/6/6/5) | 4 | 3 | 12 | Vary tools, timing and targets; state limits; no production claims | Open |
+| AI-05 | Third-party components | scikit-learn, Splunk, Shuffle, Suricata, tunnel service. AbuseIPDB and VirusTotal are in the roadmap but not in the workflow export | 2 | 3 | 6 | Pin versions in a requirements file; list suppliers; add enrichment or remove it from claims | Open |
+| R-08 | Silent loss of telemetry | Ingestion was 3 days stale on 2026-11-11 because the capture chain had stopped between sessions | 4 | 3 | 12 | Ingestion-freshness alert; restart checklist | Open |
 
-Highest scores (16): R-08, R-09, R-10. These come first in the treatment plan.
+Highest scores (16): AI-01, AI-02, R-09. These three (not a contiguous ID range) come first in the treatment plan.
 
 ## 4. AI system impact assessment
 
@@ -86,4 +86,4 @@ Acceptable for lab use with human approval and simulated response. Not acceptabl
 | G-6 | Add ingestion-freshness alert and a restart checklist | System owner | To do |
 
 ## 6. Residual risk statement
-After treatment, risks R-08 to R-10 should fall to 8 or below. R-02 stays open for a larger slow-scan sample; the single-session result above is kept as a measured (not unmeasured) finding with its small-sample caveat stated. The owner accepts R-07 as a documented risk.
+After treatment, risks AI-01, AI-02 and R-09 should fall to 8 or below. R-02 stays open for a larger slow-scan sample; the single-session result above is kept as a measured (not unmeasured) finding with its small-sample caveat stated. The owner accepts R-07 as a documented risk.
