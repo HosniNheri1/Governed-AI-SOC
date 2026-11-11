@@ -1,3 +1,6 @@
+import os
+import secrets
+from fastapi import Depends, Header
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -8,9 +11,19 @@ import json
 
 app = FastAPI(title="Governed AI-Assisted SOC - Detection Scoring API")
 
+API_KEY = os.environ.get("SOC_API_KEY")
+if not API_KEY:
+    raise RuntimeError("SOC_API_KEY is not set")
+
+def require_api_key(x_api_key: str = Header(default="")):
+    if not secrets.compare_digest(x_api_key.encode(), API_KEY.encode()):
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
 MODEL_PATH = "model_rf.joblib"
 META_PATH = "model_meta.json"
 VICTIM_IP_DEFAULT = "172.30.0.10"
+
+ALERT_THRESHOLD = float(os.environ.get("ALERT_THRESHOLD", "0.7"))
 
 _model = None
 _meta = None
@@ -35,6 +48,8 @@ class ScoreResponse(BaseModel):
     score: float
     class_probabilities: dict
     n_events_scored: int
+    alert: bool
+    threshold: float
 
 def parse_ftp_reply_codes(series):
     def first_digit(val):
@@ -127,7 +142,7 @@ def build_feature_vector(events, victim_ip, feature_cols):
 
     return pd.DataFrame([row])[feature_cols]
 
-@app.get("/health")
+@app.get("/health", dependencies=[Depends(require_api_key)])
 def health():
     try:
         model, meta = _load()
@@ -135,7 +150,7 @@ def health():
     except FileNotFoundError:
         raise HTTPException(status_code=503, detail="Model not loaded - run train_final_model.py first")
 
-@app.post("/score", response_model=ScoreResponse)
+@app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
 def score(req: ScoreRequest):
     model, meta = _load()
     feature_cols = meta["feature_cols"]
@@ -149,11 +164,13 @@ def score(req: ScoreRequest):
     proba = model.predict_proba(X)[0]
     class_probs = dict(zip(model.classes_, proba.tolist()))
     top_score = max(proba)
+    alert = bool(label != "benign" and float(top_score) >= ALERT_THRESHOLD)
 
     return ScoreResponse(
         session_id=req.session_id,
         label=label,
         score=round(float(top_score), 4),
         class_probabilities={k: round(v, 4) for k, v in class_probs.items()},
-        n_events_scored=len(req.events),
+        n_events_scored=len(req.events),        alert=alert,
+        threshold=ALERT_THRESHOLD,
     )

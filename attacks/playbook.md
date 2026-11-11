@@ -8,11 +8,20 @@
 
 ---
 
+## 0. Setup: secrets
+
+Secrets are not stored in this file. Copy `.env.example` to `.env`, set your own Splunk password in `.env` (excluded from Git), then load it before running the commands below:
+
+```bash
+cp .env.example .env
+# edit .env and set SPLUNK_PASSWORD
+source .env
+```
+
 ## 1. Lab layout confirmed
 
 - Victim container `victim1` (image `victim-victim`) exposes 21, 22, 80.
 - `suricata-internal` and `suricata-edge` run in `--network host`, sniffing Kali's interfaces directly.
-- `correlation-engine` sits on `suricata-project_default` bridge (172.19.0.2) — separate from the victim bridge.
 - `coderunner` is unrelated, left alone.
 - Victim network: `br-victims`, victim at 172.30.0.10, Kali gateway at 172.30.0.1.
 
@@ -84,6 +93,7 @@ docker exec suricata-internal suricatasc -c reload-rules
 Apache on :80 serves only a static placeholder page (no form). Added a minimal Python login endpoint on :8080 inside `victim1`:
 
 ```python
+# Intentionally weak test credential (admin / correcthorse) for the Hydra target only; not a real secret.
 # /tmp/login_server.py (copied in via docker cp, not docker exec heredoc —
 # docker exec without -i does not forward stdin, producing an empty file)
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -164,7 +174,7 @@ docker run -d --name splunk \
   -p 8000:8000 \
   -e SPLUNK_GENERAL_TERMS='--accept-sgt-current-at-splunk-com' \
   -e SPLUNK_START_ARGS='--accept-license' \
-  -e SPLUNK_PASSWORD='[REDACTED]' \
+  -e SPLUNK_PASSWORD="$SPLUNK_PASSWORD" \
   -v /var/log/suricata/internal:/var/log/suricata/internal:ro \
   splunk/splunk:latest
 ```
@@ -173,7 +183,7 @@ docker run -d --name splunk \
 ```bash
 docker exec -u splunk splunk /opt/splunk/bin/splunk add monitor \
   /var/log/suricata/internal/eve.json \
-  -sourcetype suricata:eve -index main -auth admin:[REDACTED]
+  -sourcetype suricata:eve -index main -auth "admin:$SPLUNK_PASSWORD"
 
 docker exec -u splunk splunk /opt/splunk/bin/splunk restart
 ```
@@ -202,4 +212,4 @@ Result:
 - [ ] Ship `victim1` auth logs (`/var/log/auth.log`) to Splunk — requires either a new bind mount (container recreate) or a periodic `docker cp` + monitor on a host path.
 - [ ] Write a dedicated benign-traffic generator script (normal logins/web requests/file transfers, including some incidental failed logins) rather than relying on ad hoc single commands.
 - [ ] Consider a dedicated attacker container on `br-victims` so attack source IPs are distinct from the Kali gateway address (172.30.0.1), for cleaner Day 3 labeling.
-- [ ] Revisit the Splunk `SPLUNK_PASSWORD` — rotate out of `[REDACTED]` before this leaves lab scope.
+- [x] Splunk password rotated and moved to `.env` (excluded from Git); the playbook uses `$SPLUNK_PASSWORD`.

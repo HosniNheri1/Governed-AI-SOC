@@ -8,3 +8,12 @@ data/raw/*
 *.pcap
 *.joblib
 lab/victim/logs/
+
+# secrets et données d'exécution locales
+shuffle/shuffle-database/
+shuffle/shuffle-files/
+shuffle/shuffle-apps/
+service/hydra.restore
+lab/victim/logs/
+*.swp
+__pycache__/
