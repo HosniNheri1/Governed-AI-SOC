@@ -1,9 +1,11 @@
 scenario,detection,risk_id,iso27001_control,iso42001_element,evidence
-Nmap SYN scan,Suricata rule + model,R-01,8.16;8.20,Monitoring plan,
-Slow scan,Model only (expected gap),R-02,8.16,AI risk assessment,
-SSH brute force,Suricata + model,R-03,8.5;8.16,Human oversight,
-FTP brute force,Suricata + model,R-04,8.5;8.15,Data quality,
-HTTP brute force,Suricata + model,R-05,8.5;8.15,Data quality,
-Benign baseline,No alert expected,R-06,8.15,Model card,
-Model drift,Monitoring threshold,R-07,8.16,Monitoring plan,
-Adversarial evasion,Documented risk,R-08,8.29,AI risk assessment,
+Nmap SYN scan,Suricata rule 9000001 + model,R-01,8.16;8.20,Monitoring plan,data/day5_evaluation_results.csv (per-session table); docs/day5_evaluation_report.md; attacks/playbook.md section 6
+Slow scan,Model only (expected gap),R-02,8.16,AI risk assessment,"docs/day5_evaluation_report.md section 2: one slow Nmap scan (-T2) missed by Suricata, caught by the model (n=1, not generalizable)"
+SSH brute force,Suricata + model,R-03,8.5;8.16;5.24-5.28,Human oversight,"evidence/R-03_splunk_alert_to_shuffle.png; evidence/R-03_splunk_webhook_log.png; evidence/R-03_fastapi_score_masque.png; evidence/R-03_approval_continue.png; evidence/R-03_decline_aborted.png; shuffle/governed-soc-alert-triage.masked.json. Limit: logged decision is hard-coded, see README"
+FTP brute force,Suricata rule 9000003 + model,R-04,8.5;8.15,Data quality,"data/day5_evaluation_results.csv (ftp_bruteforce sessions); attacks/playbook.md section 6. Detection only, no automated response"
+HTTP brute force,Suricata rule 9000004 + model,R-04,8.5;8.15,Data quality,"data/day5_evaluation_results.csv (http_bruteforce sessions); attacks/playbook.md section 6. Detection only, no automated response"
+Benign baseline,No alert expected,R-05,8.15,Model card,"docs/day5_evaluation_report.md summary table (FPR 0.000 on 8 benign sessions); attacks/benign_generator.sh. Limit: one narrow generator, FPR not representative"
+Model drift,Monitoring threshold,R-06,8.16,Monitoring plan,NOT COVERED by measurement: grc/42001/04-monitoring-plan.md defines indicators and triggers only; no drift check was run
+Adversarial evasion,Documented risk,R-07,8.29,AI risk assessment,"NOT TESTED: documented risk only, see grc/27001/risk_register.md and grc/42001/02-ai-risk-and-impact-assessment.md"
+Ingestion stops between sessions,Check latest(_time) before each test,R-08,8.15,Monitoring plan,grc/27001/risk_register.md (observed several times in the lab); no dedicated capture
+Exposed webhook and scoring tunnel,Masking in evidence; close or rotate after tests,R-09,8.20;8.5,AI policy P7 (secrets),grc/27001/risk_register.md; secrets masked in evidence/ and in shuffle/governed-soc-alert-triage.masked.json
