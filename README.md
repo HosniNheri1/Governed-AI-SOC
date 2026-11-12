@@ -8,6 +8,8 @@ An ML detection layer added to a Suricata / Splunk / Shuffle lab, compared again
 
 Does an ML detector add value over Suricata rules alone for detecting scans and brute force in a small network, and how can it be governed?
 
+## View the portfolio>>>>>https://hosninheri1.github.io/Governed-AI-SOC/docs/index.html
+
 ## Main result
 
 Dataset: 32 labeled sessions collected on 2026-11-07 (8 benign, 6 Nmap SYN scan, 7 SSH, 6 FTP and 5 HTTP brute force). Each number counts whole sessions.
