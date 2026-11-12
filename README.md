@@ -12,16 +12,19 @@ Does an ML detector add value over Suricata rules alone for detecting scans and 
 
 Dataset: 32 labeled sessions collected on 2026-11-07 (8 benign, 6 Nmap SYN scan, 7 SSH, 6 FTP and 5 HTTP brute force). Each number counts whole sessions.
 
-| Detector | Precision | Recall | F1 | FPR | TP | FP | FN | TN |
+| Detector | Precision | Recall (95% Wilson CI) | F1 | FPR (95% Wilson CI) | TP | FP | FN | TN |
 |---|---|---|---|---|---|---|---|---|
-| Suricata alone (local rules 9000001-9000004) | 1.000 | 0.583 | 0.737 | 0.000 | 14 | 0 | 10 | 8 |
-| Model alone (Random Forest, out-of-fold) | 1.000 | 1.000 | 1.000 | 0.000 | 24 | 0 | 0 | 8 |
-| Hybrid (Suricata OR model) | 1.000 | 1.000 | 1.000 | 0.000 | 24 | 0 | 0 | 8 |
+| Suricata alone (local rules 9000001-9000004) | 1.000 | 0.583 (0.388-0.755) | 0.737 | 0.000 (0.000-0.324) | 14 | 0 | 10 | 8 |
+| Model alone (Random Forest, out-of-fold) | 1.000 | 1.000 (0.862-1.000) | 1.000 | 0.000 (0.000-0.324) | 24 | 0 | 0 | 8 |
+| Hybrid OR (either detector flags) | 1.000 | 1.000 (0.862-1.000) | 1.000 | 0.000 (0.000-0.324) | 24 | 0 | 0 | 8 |
+| Hybrid AND (both must agree) | 1.000 | 0.583 (0.388-0.755) | 0.737 | 0.000 (0.000-0.324) | 14 | 0 | 10 | 8 |
+
+Hybrid AND equals Suricata alone here because every session Suricata flagged was also flagged by the model. Source: `data/day5_evaluation_summary_v2.csv`.
 
 **What this supports, and what it does not.**
 - Suricata missed 10 of 24 attacks. All 10 are explained by one mechanism: the local rules use fixed thresholds (`count 5, seconds 60` for brute force; 20 SYNs in 5 s for scans), so low-and-slow activity never crosses them. Every Hydra run with `-t1` or `-t2` (9 sessions) and the one `-T2` Nmap scan were missed; every run with `-t4` or `-t6` (9 sessions) was caught.
 - The model uses session-level features (duration, distinct ports, FTP failure rate, HTTP POST count) and caught all 10. On this data the hybrid reduces missed detections. This does **not** show that the model replaces Suricata.
-- With 24 attack and 8 benign sessions the intervals are wide: a recall of 24/24 has a 95% Wilson lower bound of about 86%, and an FPR of 0/8 has an upper bound of about 32%.
+- With 24 attack and 8 benign sessions the intervals are wide: a recall of 24/24 has a 95% Wilson lower bound of 0.862, and an FPR of 0/8 has an upper bound of 0.324. Point estimates of 1.000 and 0.000 should not be quoted without these intervals.
 - The false-positive side of the hypothesis was not tested: Suricata already had FPR 0 on this data.
 
 Details: [`docs/day5_evaluation_report.md`](docs/day5_evaluation_report.md).
