@@ -8,7 +8,7 @@ An ML detection layer added to a Suricata / Splunk / Shuffle lab, compared again
 
 Does an ML detector add value over Suricata rules alone for detecting scans and brute force in a small network, and how can it be governed?
 
-## View the portfolio>>>>>https://hosninheri1.github.io/Governed-AI-SOC/docs/index.html
+## View the portfolio>>>>>https://hosninheri1.github.io/Governed-AI-SOC/
 
 ## Main result
 
